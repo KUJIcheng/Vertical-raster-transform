@@ -19,39 +19,6 @@
 
     let originalFileName = ""
 
-    let currentLanguage = "zh";
-
-    const languageTexts = {
-        zh: {
-            selectedImage: "已选图片",
-            chooseImage: "选择图片",
-            rasterizedImage: "光栅化图片",
-            parameterAdjustment: "参数调节",
-            sliceCount: "切片数量",
-            blurRadius: "模糊半径",
-            highlightIntensity: "光照强度",
-            shadowIntensity: "阴影强度",
-            convert: "转换",
-            download: "下载",
-            uploadFirst: "请先上传图片",
-            loading: "加载中...",
-        },
-        en: {
-            selectedImage: "Selected Image",
-            chooseImage: "Choose Image",
-            rasterizedImage: "Rasterized Image",
-            parameterAdjustment: "Parameter Adjustment",
-            sliceCount: "Slice Count",
-            blurRadius: "Blur Radius",
-            highlightIntensity: "Highlight Intensity",
-            shadowIntensity: "Shadow Intensity",
-            convert: "Convert",
-            download: "Download",
-            uploadFirst: "Please upload an image first",
-            loading: "Loading...",
-        },
-    };
-
     let isEnglish = false;
 
     uploadedImage = defaultUploadedImage;
