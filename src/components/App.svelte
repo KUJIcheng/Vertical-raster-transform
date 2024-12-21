@@ -222,7 +222,7 @@ result
     </div>
 
     <div class="loading" class:hidden={!isLoading}>
-        <img src="icons8-dots-loading.gif" alt={isEnglish ? "Loading" : "加载中..."} />
+        <img src="icons8-loading4.gif" alt={isEnglish ? "Loading" : "加载中..."} />
     </div>
 
     <button class="download-button" on:click={handleDownload} disabled={!isDownloadable}>{isEnglish ? "Download" : "下载"}</button>
@@ -242,6 +242,10 @@ result
     :global(body) {
         margin: 0;
         overflow: hidden;
+        background-image: url('/bg7.png'); 
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
     }
 
     main {
@@ -256,9 +260,9 @@ result
 
     .rectangle {
         position: absolute;
-        background-color: #f0f0f0;
+        background-color: rgba(248, 248, 248, 0.9);
         border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 9px rgba(0, 0, 0, 0.13);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -268,7 +272,7 @@ result
     .label {
         position: absolute;
         top: -10%;
-        font-size: 1.5vw;
+        font-size: 1.45vw;
         color: #333;
         text-align: center;
     }
@@ -324,15 +328,15 @@ result
 
     .upload-button {
         position: absolute;
-        left: 16.5%;
+        left: 17.5%;
         top: calc(50% + 40%);
         transform: translateY(-50%);
         background-color: #007bff;
         color: white;
         border: none;
-        border-radius: 20px;
+        border-radius: 2vw;
         padding: 0.5% 1%;
-        font-size: 1rem;
+        font-size: 1vw;
         cursor: pointer;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         transition: background-color 0.3s;
@@ -346,9 +350,9 @@ result
         background-color: #28a745;
         color: white;
         border: none;
-        border-radius: 20px;
+        border-radius: 2vw;
         padding: 3% 8%;
-        font-size: 1rem;
+        font-size: 1vw;
         cursor: pointer;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         transition: background-color 0.3s;
@@ -398,15 +402,15 @@ result
 
     .download-button {
         position: absolute;
-        left: 77.5%;
+        right: 18.3%;
         top: calc(50% + 40%);
         transform: translateY(-50%);
         background-color: #007bff;
         color: white;
         border: none;
-        border-radius: 20px;
+        border-radius: 2vw;
         padding: 0.5% 1%;
-        font-size: 1rem;
+        font-size: 1vw;
         cursor: pointer;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         transition: background-color 0.3s;
@@ -451,7 +455,7 @@ result
         left: 0;
         right: 0;
         bottom: 0;
-        background-color: #ccc;
+        background-color: #e0aaaa;
         transition: 0.4s;
         border-radius: 20px;
     }
@@ -469,7 +473,7 @@ result
     }
 
     input:checked + .slider {
-        background-color: #ccc;
+        background-color: #626ea5;
     }
 
     input:checked + .slider:before {
