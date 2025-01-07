@@ -211,10 +211,10 @@ result
             <label>{isEnglish ? "Blur Radius" : "模糊半径"}: {blurRadius}
                 <input type="range" min="0" max="100" bind:value={blurRadius} />
             </label>
-            <label>{isEnglish ? "Highlight Intensity" : "光照强度"}: {highlightIntensity.toFixed(2)}
+            <label>{isEnglish ? "Highlight" : "光照强度"}: {highlightIntensity.toFixed(2)}
                 <input type="range" min="0" max="1.0" step="0.01" bind:value={highlightIntensity} />
             </label>
-            <label>{isEnglish ? "Shadow Intensity" : "阴影强度"}: {shadowIntensity.toFixed(2)}
+            <label>{isEnglish ? "Shadow" : "阴影强度"}: {shadowIntensity.toFixed(2)}
                 <input type="range" min="0" max="1.0" step="0.01" bind:value={shadowIntensity} />
             </label>
         </div>
@@ -328,7 +328,7 @@ result
 
     .upload-button {
         position: absolute;
-        left: 17.5%;
+        left: 15%;
         top: calc(50% + 40%);
         transform: translateY(-50%);
         background-color: #007bff;
@@ -340,6 +340,8 @@ result
         cursor: pointer;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         transition: background-color 0.3s;
+        min-width: 10%;
+        min-height: 5%;
     }
 
     .upload-button:hover {
@@ -356,6 +358,8 @@ result
         cursor: pointer;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         transition: background-color 0.3s;
+        min-width: 40%;
+        min-height: 10%;
     }
 
     .convert-button:hover {
@@ -364,24 +368,52 @@ result
 
     .controls {
         display: flex;
-        flex-direction: column;
+        flex-direction: column; /* 垂直布局 */
         justify-content: space-between;
-        height: 70%; /* 控件区域占比 */
-        padding: 5%;
-        gap: 3%; /* 控件之间的间距 */
+        align-items: center; /* 保持子元素居中 */
+        gap: 16px; /* 控件之间的间距 */
     }
 
     .controls label {
         display: flex;
         flex-direction: column; /* 垂直排列文字和拖动条 */
-        align-items: stretch; /* 让拖动条拉伸填满宽度 */
-        font-size: 1rem;
-        gap: 5px; /* 文字与拖动条之间的间距 */
+        align-items: center; /* 居中对齐 */
+        font-size: 0.95rem;
+        gap: 12px; /* 文字与拖动条之间的间距 */
+        width: 300px; /* 固定宽度 */
     }
 
     .controls input[type="range"] {
-        width: 100%;
+        width: 50%; /* 宽度占满父容器 */
+        max-width: none; /* 移除最大宽度限制 */
         margin: 0 auto;
+        appearance: none; /* 移除浏览器默认样式 */
+        height: 6px; /* 自定义高度 */
+        background: #ddd; /* 背景颜色 */
+        border-radius: 5px; /* 圆角 */
+        outline: none; /* 去除聚焦时的轮廓 */
+        transition: background-color 0.3s;
+    }
+
+    .controls input[type="range"]::-webkit-slider-thumb {
+        appearance: none; /* 移除默认样式 */
+        width: 16px; /* 滑块宽度 */
+        height: 16px; /* 滑块高度 */
+        background: #007bff; /* 滑块颜色 */
+        border-radius: 50%; /* 圆形滑块 */
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* 阴影 */
+        transition: background-color 0.3s;
+    }
+
+    .controls input[type="range"]::-moz-range-thumb,
+    .controls input[type="range"]::-ms-thumb {
+        width: 16px;
+        height: 16px;
+        background: #007bff;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
 
     .loading {
@@ -402,7 +434,7 @@ result
 
     .download-button {
         position: absolute;
-        right: 18.3%;
+        right: 15%;
         top: calc(50% + 40%);
         transform: translateY(-50%);
         background-color: #007bff;
@@ -414,6 +446,8 @@ result
         cursor: pointer;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         transition: background-color 0.3s;
+        min-width: 10%;
+        min-height: 5%;
     }
 
     .download-button:disabled {
