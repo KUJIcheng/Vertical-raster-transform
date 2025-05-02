@@ -5,10 +5,51 @@
     let screenHeight = 0;
     let uploadedImage = null;
     let processedImage = null;
-    let sliceCount = 10;
-    let blurRadius = 10;
-    let highlightIntensity = 0.1;
-    let shadowIntensity = 0.1;
+
+    // 当前选择的模式：raster = 光栅玻璃, rainbow = 虹玻璃
+    let mode = "raster";
+
+    // 每种模式的默认参数
+    const defaultParams = {
+        raster: {
+            sliceCount: 10,
+            blurRadius: 10,
+            highlightIntensity: 0.1,
+            shadowIntensity: 0.1
+        },
+        rainbow: {
+            sliceCount: 20,
+            blurRadius: 10,
+            highlightIntensity: 0.1,
+            shadowIntensity: 0.1,
+            narrowRatioDivisor: 4
+        }
+    };
+
+    // 初始化参数为 raster 模式
+    let sliceCount = defaultParams.raster.sliceCount;
+    let blurRadius = defaultParams.raster.blurRadius;
+    let highlightIntensity = defaultParams.raster.highlightIntensity;
+    let shadowIntensity = defaultParams.raster.shadowIntensity;
+    let narrowRatioDivisor = defaultParams.rainbow.narrowRatioDivisor; // 仅 rainbow 用
+
+    function handleModeChange(event) {
+        mode = event.target.value;
+        const params = defaultParams[mode];
+        sliceCount = params.sliceCount;
+        blurRadius = params.blurRadius;
+        highlightIntensity = params.highlightIntensity;
+        shadowIntensity = params.shadowIntensity;
+        if (mode === "rainbow") {
+            narrowRatioDivisor = params.narrowRatioDivisor;
+        }
+    }
+
+    // let sliceCount = 10;
+    // let blurRadius = 10;
+    // let highlightIntensity = 0.1;
+    // let shadowIntensity = 0.1;
+    
     let pyodide = null;
     let pyodideReady = false;
 
@@ -75,64 +116,204 @@
 
         isLoading = true;
 
-        const pythonCode = `
-from PIL import Image, ImageFilter, ImageDraw
-from io import BytesIO
-import base64
+        const imageData = uploadedImage.split(",")[1];
 
-def raster_blur_effect(data, file_type, slice_count, blur_radius, highlight_intensity, shadow_intensity):
-    input_image = Image.open(BytesIO(base64.b64decode(data)))
-    width, height = input_image.size
+        let pythonCode = "";
 
-    num_slices = (slice_count + 1) // 2
-    original_slice_width = int(width / num_slices)
-    step_width = int(width / (num_slices / 0.5))
-    compressed_slice_width = int(width / slice_count)
+        if (mode === "raster") {
+            pythonCode = `
+        from PIL import Image, ImageFilter, ImageDraw
+        from io import BytesIO
+        import base64
 
-    slices = []
-    for i in range(slice_count):
-        start_x = int(i * step_width)
-        end_x = min(start_x + original_slice_width, width)
-        slice_strip = input_image.crop((start_x, 0, end_x, height))
+        def raster_blur_effect(data, file_type, slice_count, blur_radius, highlight_intensity, shadow_intensity):
+            input_image = Image.open(BytesIO(base64.b64decode(data)))
+            width, height = input_image.size
 
-        if blur_radius > 0:
-            slice_strip = slice_strip.filter(ImageFilter.GaussianBlur(blur_radius))
+            num_slices = (slice_count + 1) // 2
+            original_slice_width = int(width / num_slices)
+            step_width = int(width / (num_slices / 0.5))
+            compressed_slice_width = int(width / slice_count)
 
-        if highlight_intensity > 0:
-            highlight_width = int(original_slice_width * 0.2)
-            gradient = Image.new('RGBA', (highlight_width, height), (255, 255, 255, 0))
-            gradient_draw = ImageDraw.Draw(gradient)
-            for x in range(highlight_width):
-                alpha = int(255 * highlight_intensity * (1 - x / highlight_width))
-                gradient_draw.line([(x, 0), (x, height)], fill=(255, 255, 255, alpha))
-            slice_strip.paste(gradient, (0, 0), gradient)
+            slices = []
+            for i in range(slice_count):
+                start_x = int(i * step_width)
+                end_x = min(start_x + original_slice_width, width)
+                slice_strip = input_image.crop((start_x, 0, end_x, height))
 
-        if shadow_intensity > 0:
-            shadow_width = int(original_slice_width * 0.1)
-            gradient = Image.new('RGBA', (shadow_width, height), (0, 0, 0, 0))
-            gradient_draw = ImageDraw.Draw(gradient)
-            for x in range(shadow_width):
-                alpha = int(255 * shadow_intensity * (x / shadow_width))
-                gradient_draw.line([(x, 0), (x, height)], fill=(0, 0, 0, alpha))
-            slice_strip.paste(gradient, (original_slice_width - shadow_width, 0), gradient)
+                if blur_radius > 0:
+                    slice_strip = slice_strip.filter(ImageFilter.GaussianBlur(blur_radius))
 
-        slices.append(slice_strip.resize((compressed_slice_width, height), Image.Resampling.LANCZOS))
+                if highlight_intensity > 0:
+                    highlight_width = int(original_slice_width * 0.2)
+                    gradient = Image.new('RGBA', (highlight_width, height), (255, 255, 255, 0))
+                    gradient_draw = ImageDraw.Draw(gradient)
+                    for x in range(highlight_width):
+                        alpha = int(255 * highlight_intensity * (1 - x / highlight_width))
+                        gradient_draw.line([(x, 0), (x, height)], fill=(255, 255, 255, alpha))
+                    slice_strip.paste(gradient, (0, 0), gradient)
 
-    final_image_width = compressed_slice_width * slice_count
-    final_image = Image.new('RGB', (final_image_width, height))
-    x_offset = 0
-    for strip in slices:
-        final_image.paste(strip, (x_offset, 0))
-        x_offset += compressed_slice_width
+                if shadow_intensity > 0:
+                    shadow_width = int(original_slice_width * 0.1)
+                    gradient = Image.new('RGBA', (shadow_width, height), (0, 0, 0, 0))
+                    gradient_draw = ImageDraw.Draw(gradient)
+                    for x in range(shadow_width):
+                        alpha = int(255 * shadow_intensity * (x / shadow_width))
+                        gradient_draw.line([(x, 0), (x, height)], fill=(0, 0, 0, alpha))
+                    slice_strip.paste(gradient, (original_slice_width - shadow_width, 0), gradient)
 
-    final_image = final_image.resize((width, height), Image.Resampling.LANCZOS)
-    output_buffer = BytesIO()
-    final_image.save(output_buffer, format="PNG")
-    return base64.b64encode(output_buffer.getvalue()).decode("utf-8")
+                slices.append(slice_strip.resize((compressed_slice_width, height), Image.Resampling.LANCZOS))
 
-result = raster_blur_effect("${uploadedImage.split(",")[1]}", "PNG", ${sliceCount}, ${blurRadius}, ${highlightIntensity}, ${shadowIntensity})
-result
-`;
+            final_image_width = compressed_slice_width * slice_count
+            final_image = Image.new('RGB', (final_image_width, height))
+            x_offset = 0
+            for strip in slices:
+                final_image.paste(strip, (x_offset, 0))
+                x_offset += compressed_slice_width
+
+            final_image = final_image.resize((width, height), Image.Resampling.LANCZOS)
+            output_buffer = BytesIO()
+            final_image.save(output_buffer, format="PNG")
+            return base64.b64encode(output_buffer.getvalue()).decode("utf-8")
+
+        result = raster_blur_effect("${imageData}", "PNG", ${sliceCount}, ${blurRadius}, ${highlightIntensity}, ${shadowIntensity})
+        result
+        `;
+        } else if (mode === "rainbow") {
+            pythonCode = `
+        from PIL import Image, ImageFilter, ImageDraw
+        import base64
+        from io import BytesIO
+
+        def raster_blur_effect3(data_base64, slice_count, blur_radius, highlight_intensity, shadow_intensity, narrow_ratio_divisor):
+            input_image = Image.open(BytesIO(base64.b64decode(data_base64)))
+            width, height = input_image.size
+            total_leaves = 2 * slice_count - 1
+            raw_leaf_width = width / total_leaves
+
+            base_divisor = 6
+            base_multiplier = 8
+            scale_factor = 0.2
+            narrow_sampling_multiplier = base_multiplier + scale_factor * max(0, (narrow_ratio_divisor - base_divisor))
+
+            strips = []
+
+            for i in range(total_leaves):
+                is_wide = (i % 2 == 0)
+                if is_wide:
+                    start_x = int(i * raw_leaf_width)
+                    end_x = int(start_x + raw_leaf_width)
+                else:
+                    center_x = int(i * raw_leaf_width + raw_leaf_width / 2)
+                    half_width = int(raw_leaf_width * narrow_sampling_multiplier / 2)
+                    start_x = max(0, center_x - half_width)
+                    end_x = min(width, center_x + half_width)
+
+                raw_strip = input_image.crop((start_x, 0, end_x, height))
+                applied_blur = blur_radius
+                if applied_blur > 0:
+                    raw_strip = raw_strip.filter(ImageFilter.GaussianBlur(applied_blur))
+
+                if highlight_intensity > 0:
+                    highlight_w = int(raw_strip.width * 0.2)
+                    gradient = Image.new('RGBA', (highlight_w, height), (255, 255, 255, 0))
+                    draw = ImageDraw.Draw(gradient)
+                    for x in range(highlight_w):
+                        alpha = int(255 * highlight_intensity * (1 - x / highlight_w))
+                        draw.line([(x, 0), (x, height)], fill=(255, 255, 255, alpha))
+                    raw_strip.paste(gradient, (0, 0), gradient)
+
+                if shadow_intensity > 0:
+                    shadow_w = int(raw_strip.width * 0.1)
+                    gradient = Image.new('RGBA', (shadow_w, height), (0, 0, 0, 0))
+                    draw = ImageDraw.Draw(gradient)
+                    for x in range(shadow_w):
+                        alpha = int(255 * shadow_intensity * (x / shadow_w))
+                        draw.line([(x, 0), (x, height)], fill=(0, 0, 0, alpha))
+                    raw_strip.paste(gradient, (raw_strip.width - shadow_w, 0), gradient)
+
+                compressed_width = int(raw_strip.width) if is_wide else int(raw_leaf_width / narrow_ratio_divisor)
+                strip = raw_strip.resize((compressed_width, height), Image.Resampling.LANCZOS)
+                strips.append(strip)
+
+            combined_width = sum(s.width for s in strips)
+            combined_image = Image.new('RGB', (combined_width, height))
+            offset = 0
+            for s in strips:
+                combined_image.paste(s, (offset, 0))
+                offset += s.width
+
+            final_image = combined_image.resize((width, height), Image.Resampling.LANCZOS)
+            output_buffer = BytesIO()
+            final_image.save(output_buffer, format="PNG")
+            return base64.b64encode(output_buffer.getvalue()).decode("utf-8")
+
+        result = raster_blur_effect3("${imageData}", ${sliceCount}, ${blurRadius}, ${highlightIntensity}, ${shadowIntensity}, ${narrowRatioDivisor})
+        result
+        `;
+        }
+
+
+
+
+//         const pythonCode = `
+// from PIL import Image, ImageFilter, ImageDraw
+// from io import BytesIO
+// import base64
+
+// def raster_blur_effect(data, file_type, slice_count, blur_radius, highlight_intensity, shadow_intensity):
+//     input_image = Image.open(BytesIO(base64.b64decode(data)))
+//     width, height = input_image.size
+
+//     num_slices = (slice_count + 1) // 2
+//     original_slice_width = int(width / num_slices)
+//     step_width = int(width / (num_slices / 0.5))
+//     compressed_slice_width = int(width / slice_count)
+
+//     slices = []
+//     for i in range(slice_count):
+//         start_x = int(i * step_width)
+//         end_x = min(start_x + original_slice_width, width)
+//         slice_strip = input_image.crop((start_x, 0, end_x, height))
+
+//         if blur_radius > 0:
+//             slice_strip = slice_strip.filter(ImageFilter.GaussianBlur(blur_radius))
+
+//         if highlight_intensity > 0:
+//             highlight_width = int(original_slice_width * 0.2)
+//             gradient = Image.new('RGBA', (highlight_width, height), (255, 255, 255, 0))
+//             gradient_draw = ImageDraw.Draw(gradient)
+//             for x in range(highlight_width):
+//                 alpha = int(255 * highlight_intensity * (1 - x / highlight_width))
+//                 gradient_draw.line([(x, 0), (x, height)], fill=(255, 255, 255, alpha))
+//             slice_strip.paste(gradient, (0, 0), gradient)
+
+//         if shadow_intensity > 0:
+//             shadow_width = int(original_slice_width * 0.1)
+//             gradient = Image.new('RGBA', (shadow_width, height), (0, 0, 0, 0))
+//             gradient_draw = ImageDraw.Draw(gradient)
+//             for x in range(shadow_width):
+//                 alpha = int(255 * shadow_intensity * (x / shadow_width))
+//                 gradient_draw.line([(x, 0), (x, height)], fill=(0, 0, 0, alpha))
+//             slice_strip.paste(gradient, (original_slice_width - shadow_width, 0), gradient)
+
+//         slices.append(slice_strip.resize((compressed_slice_width, height), Image.Resampling.LANCZOS))
+
+//     final_image_width = compressed_slice_width * slice_count
+//     final_image = Image.new('RGB', (final_image_width, height))
+//     x_offset = 0
+//     for strip in slices:
+//         final_image.paste(strip, (x_offset, 0))
+//         x_offset += compressed_slice_width
+
+//     final_image = final_image.resize((width, height), Image.Resampling.LANCZOS)
+//     output_buffer = BytesIO()
+//     final_image.save(output_buffer, format="PNG")
+//     return base64.b64encode(output_buffer.getvalue()).decode("utf-8")
+
+// result = raster_blur_effect("${uploadedImage.split(",")[1]}", "PNG", ${sliceCount}, ${blurRadius}, ${highlightIntensity}, ${shadowIntensity})
+// result
+// `;
 
         try {
             const result = await pyodide.runPythonAsync(pythonCode);
@@ -187,6 +368,16 @@ result
 
 
 <main>
+    <div class="mode-selector">
+        <label>
+            {isEnglish ? "Effect Mode" : "效果模式"}:
+            <select bind:value={mode} on:change={handleModeChange}>
+                <option value="raster">{isEnglish ? "Raster Glass Effect" : "光栅玻璃效果"}</option>
+                <option value="rainbow">{isEnglish ? "Rainbow Glass Effect" : "虹玻璃效果"}</option>
+            </select>
+        </label>
+    </div>
+    
     <!-- Left Rectangle -->
     <div class="rectangle left">
         <div class="label">{isEnglish ? "Selected Image" : "已选图片"}</div>
@@ -217,6 +408,11 @@ result
             <label>{isEnglish ? "Shadow" : "阴影强度"}: {shadowIntensity.toFixed(2)}
                 <input type="range" min="0" max="1.0" step="0.01" bind:value={shadowIntensity} />
             </label>
+            {#if mode === "rainbow"}
+                <label>{isEnglish ? "Compression Ratio" : "聚光压缩比"}: {narrowRatioDivisor}
+                    <input type="range" min="2" max="20" bind:value={narrowRatioDivisor} />
+                </label>
+            {/if}
         </div>
         <button class="convert-button" on:click={handleConversion}>{isEnglish ? "Convert" : "转换"}</button>
     </div>
@@ -513,4 +709,30 @@ result
     input:checked + .slider:before {
         transform: translateX(20px);
     }
+
+    .mode-selector {
+        position: absolute;
+        top: 2%;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.05rem;
+        z-index: 10;
+        background-color: rgba(255, 255, 255, 0.85);
+        padding: 6px 16px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .mode-selector select {
+        margin-left: 10px;
+        font-size: 0.95rem;
+        padding: 4px 8px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        background-color: white;
+    }
+
 </style>
