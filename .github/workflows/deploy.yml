@@ -9,7 +9,7 @@ on:
 permissions:
   contents: read
   pages: write
-  id-token: write  # ✅ 让 `deploy-pages@v4` 访问 artifact
+  id-token: write  # 允许 GitHub Pages 上传部署
 
 concurrency:
   group: "pages"
@@ -20,36 +20,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: 📦 Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: 🧰 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: npm
 
-      - name: Install dependencies
+      - name: 📥 Install dependencies
         run: npm install
 
-      - name: Build SvelteKit App
+      - name: 🏗️ Build SvelteKit App
         env:
-          BASE_PATH: "/${{ github.event.repository.name }}"  # ✅ 确保 `BASE_PATH` 适用于 GitHub Pages
+          BASE_PATH: "/${{ github.event.repository.name }}"  # 动态设置路径前缀
         run: npm run build
 
-      - name: Manually copy pyodide folder to build
-        run: |
-          mkdir -p build/pyodide
-          cp -r static/pyodide/* build/pyodide/
-
-      - name: Debug - List build directory  # ✅ 修正 YAML 解析错误
+      - name: 🪵 Debug - List build directory
         run: ls -lah build/
 
-      - name: Upload GitHub Pages Artifact
+      - name: 📤 Upload GitHub Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: build/  # ✅ 确保上传 `build/` 目录
-          name: github-pages  # ✅ 确保 artifact 名称正确
+          path: build/  # 上传构建后的页面文件
+          name: github-pages
 
   deploy:
     needs: build
@@ -59,11 +54,11 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - name: Setup Pages
-        uses: actions/configure-pages@v5  # ✅ 确保 GitHub Pages 配置正确
+      - name: ⚙️ Setup GitHub Pages
+        uses: actions/configure-pages@v5
 
-      - name: Deploy to GitHub Pages
+      - name: 🚀 Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4  # ✅ 使用最新 `v4`
+        uses: actions/deploy-pages@v4
         with:
-          artifact_name: github-pages  # ✅ 确保 `deploy-pages@v4` 读取正确的 artifact
+          artifact_name: github-pages
