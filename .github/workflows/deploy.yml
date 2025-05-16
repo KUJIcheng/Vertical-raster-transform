@@ -37,6 +37,11 @@ jobs:
           BASE_PATH: "/${{ github.event.repository.name }}"  # ✅ 确保 `BASE_PATH` 适用于 GitHub Pages
         run: npm run build
 
+      - name: Manually copy pyodide folder to build
+        run: |
+          mkdir -p build/pyodide
+          cp -r static/pyodide/* build/pyodide/
+
       - name: Debug - List build directory  # ✅ 修正 YAML 解析错误
         run: ls -lah build/
 
