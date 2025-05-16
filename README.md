@@ -1,9 +1,15 @@
+<p align="right">
+  <a href="./README.zh-CN.md">简体中文 🇨🇳</a> |
+  <a href="./README.md">English 🇺🇸</a>
+</p>
+
 # Photo Rasteriator
+
+👉 [Click here to try it online](https://kujicheng.github.io/Vertical-raster-transform/)
 
 Photo Rasteriator is a web-based tool that allows users to upload an image, adjust various parameters, and generate a rasterized version of the image using Python running on the browser via Pyodide. The tool is built using SvelteKit, providing a responsive and user-friendly interface.
 
 ---
-
 ## Features
 
 - **Upload Images**: Users can upload `.png` or `.jpg` images for processing.
@@ -20,7 +26,7 @@ Photo Rasteriator is a web-based tool that allows users to upload an image, adju
 ## Usage
 
 1. **Upload an Image**:
-   - Click the **"Choose Image"** button (or **"选择图片"** in Chinese) located below the left rectangle.
+   - Click the **"Choose Image"** button located below the left rectangle.
    - Select an image file in `.png` or `.jpg` format.
    - The uploaded image will appear in the left rectangle.
 
@@ -32,11 +38,11 @@ Photo Rasteriator is a web-based tool that allows users to upload an image, adju
      - **Shadow Intensity**: Intensity of shadows (range: 0.00-1.00).
 
 3. **Process the Image**:
-   - Click the **"Convert"** button (or **"转换"** in Chinese) located below the parameter sliders.
+   - Click the **"Convert"** button located below the parameter sliders.
    - A loading animation will appear while the image is being processed.
 
 4. **Download the Result**:
-   - Once processing is complete, click the **"Download"** button (or **"下载"** in Chinese) below the right rectangle.
+   - Once processing is complete, click the **"Download"** button below the right rectangle.
    - The rasterized image will be saved in the same format as the original image, with a filename appended with `_ra` (e.g., `original_ra.png`).
 
 5. **Toggle Language**:

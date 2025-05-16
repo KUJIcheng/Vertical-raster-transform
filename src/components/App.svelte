@@ -464,6 +464,10 @@
 
     <button class="download-button" on:click={handleDownload} disabled={!isDownloadable}>{isEnglish ? "Download" : "下载"}</button>
 
+    <a class="github-link" href="https://github.com/KUJIcheng/Vertical-raster-transform" target="_blank" rel="noopener noreferrer">
+        {isEnglish ? "View on GitHub" : "查看 GitHub 项目"}
+    </a>
+
     <!-- Language Toggle -->
     <div class="language-toggle">
         <span>中文</span>
@@ -776,4 +780,27 @@
         background-color: white;
     }
 
+    .github-link {
+        position: absolute;
+        top: 1.5%;
+        right: 93%; 
+        background-color: #24292e;
+        color: white;
+        text-decoration: none;
+        padding: 4px 10px;
+        border-radius: 50px;
+        font-size: 0.5vw;
+        height: 3%;
+        width: 5%;
+        line-height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .github-link:hover {
+        background-color: #0366d6; /* GitHub 蓝色 */
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
 </style>
