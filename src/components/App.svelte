@@ -12,7 +12,7 @@
     // 每种模式的默认参数
     const defaultParams = {
         raster: {
-            sliceCount: 10,
+            sliceCount: 20,
             blurRadius: 10,
             highlightIntensity: 0.1,
             shadowIntensity: 0.1
@@ -82,12 +82,38 @@
         screenHeight = window.innerHeight;
     };
 
+    // 备份加载方程
+    // const loadPyodideAndPackages = async () => {
+    //     console.log("Loading Pyodide...");
+    //     pyodide = await loadPyodide();
+    //     await pyodide.loadPackage("Pillow");
+    //     pyodideReady = true;
+    //     console.log("Pyodide and Pillow loaded successfully.");
+    // };
+
     const loadPyodideAndPackages = async () => {
         console.log("Loading Pyodide...");
-        pyodide = await loadPyodide();
-        await pyodide.loadPackage("Pillow");
+
+        pyodide = await loadPyodide({
+            indexURL: "/pyodide/"
+        });
+
+        console.log("Loading Pillow, numpy");
+
+        // 先加载 micropip
+        await pyodide.loadPackage("micropip");
+
+        const origin = location.origin + location.pathname.replace(/\/[^\/]*$/, "");
+
+        await pyodide.runPythonAsync(`
+            import micropip
+            origin = "${origin}"
+            await micropip.install(f"{origin}/pyodide/packages/numpy-2.0.2-cp312-cp312-pyodide_2024_0_wasm32.whl")
+            await micropip.install(f"{origin}/pyodide/packages/pillow-10.2.0-cp312-cp312-pyodide_2024_0_wasm32.whl")
+        `);
+
         pyodideReady = true;
-        console.log("Pyodide and Pillow loaded successfully.");
+        console.log("Pyodide and packages loaded successfully.");
     };
 
     const handleImageUpload = (event) => {
@@ -253,9 +279,6 @@
         `;
         }
 
-
-
-
 //         const pythonCode = `
 // from PIL import Image, ImageFilter, ImageDraw
 // from io import BytesIO
@@ -349,12 +372,29 @@
         document.body.removeChild(link);
     };
 
+    // 备份onmount函数
+    // onMount(async () => {
+    //     updateDimensions();
+    //     window.addEventListener('resize', updateDimensions);
+
+    //     try {
+    //         await loadScript('https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js'); // 0.23.4
+    //         await loadPyodideAndPackages();
+    //     } catch (error) {
+    //         console.error("Failed to load Pyodide:", error);
+    //     }
+
+    //     return () => {
+    //         window.removeEventListener('resize', updateDimensions);
+    //     };
+    // });
+
     onMount(async () => {
         updateDimensions();
         window.addEventListener('resize', updateDimensions);
 
         try {
-            await loadScript('https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js');
+            await loadScript('/pyodide/pyodide.js');
             await loadPyodideAndPackages();
         } catch (error) {
             console.error("Failed to load Pyodide:", error);
