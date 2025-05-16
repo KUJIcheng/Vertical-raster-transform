@@ -89,12 +89,12 @@
     let baseURL;
 
     if (typeof window !== "undefined") {
-    const { protocol, host, pathname } = window.location;
+        const { protocol, host, pathname } = window.location;
 
-    // 判断是否在 GitHub Pages
-    const isGithubPages = pathname.startsWith("/Vertical-raster-transform");
+        // 判断是否在 GitHub Pages
+        const isGithubPages = pathname.startsWith("/Vertical-raster-transform");
 
-    baseURL = `${protocol}//${host}${isGithubPages ? "/Vertical-raster-transform" : ""}`;
+        baseURL = `${protocol}//${host}${isGithubPages ? "/Vertical-raster-transform" : ""}`;
     }
 
 
@@ -102,15 +102,15 @@
         console.log("Loading Pyodide...");
 
         pyodide = await loadPyodide({
-            indexURL: `${baseURL}/pyodide/`
+            indexURL: `${baseURL}`
         });
 
         await pyodide.loadPackage("micropip");
 
         await pyodide.runPythonAsync(`
             import micropip
-            await micropip.install("${baseURL}/pyodide/packages/numpy-2.0.2-cp312-cp312-pyodide_2024_0_wasm32.whl")
-            await micropip.install("${baseURL}/pyodide/packages/pillow-10.2.0-cp312-cp312-pyodide_2024_0_wasm32.whl")
+            await micropip.install("${baseURL}/numpy-2.0.2-cp312-cp312-pyodide_2024_0_wasm32.whl")
+            await micropip.install("${baseURL}/pillow-10.2.0-cp312-cp312-pyodide_2024_0_wasm32.whl")
         `);
 
         pyodideReady = true;
