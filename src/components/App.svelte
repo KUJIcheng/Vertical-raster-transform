@@ -395,7 +395,7 @@
         window.addEventListener('resize', updateDimensions);
 
         try {
-            await loadScript('/pyodide/pyodide.js');
+            await loadScript('pyodide.js');
             await loadPyodideAndPackages();
         } catch (error) {
             console.error("Failed to load Pyodide:", error);
