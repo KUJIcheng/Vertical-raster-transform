@@ -44,11 +44,6 @@
             narrowRatioDivisor = params.narrowRatioDivisor;
         }
     }
-
-    // let sliceCount = 10;
-    // let blurRadius = 10;
-    // let highlightIntensity = 0.1;
-    // let shadowIntensity = 0.1;
     
     let pyodide = null;
     let pyodideReady = false;
@@ -91,25 +86,23 @@
     //     console.log("Pyodide and Pillow loaded successfully.");
     // };
 
+    const basePath = import.meta.env.DEV ? "" : "/Vertical-raster-transform";
+
     const loadPyodideAndPackages = async () => {
         console.log("Loading Pyodide...");
 
         pyodide = await loadPyodide({
-            indexURL: "/pyodide/"
+            indexURL: `${basePath}/pyodide/`
         });
 
         console.log("Loading Pillow, numpy");
 
-        // 先加载 micropip
         await pyodide.loadPackage("micropip");
-
-        const origin = location.origin + location.pathname.replace(/\/[^\/]*$/, "");
 
         await pyodide.runPythonAsync(`
             import micropip
-            origin = "${origin}"
-            await micropip.install(f"{origin}/pyodide/packages/numpy-2.0.2-cp312-cp312-pyodide_2024_0_wasm32.whl")
-            await micropip.install(f"{origin}/pyodide/packages/pillow-10.2.0-cp312-cp312-pyodide_2024_0_wasm32.whl")
+            await micropip.install("${basePath}/pyodide/packages/numpy-2.0.2-cp312-cp312-pyodide_2024_0_wasm32.whl")
+            await micropip.install("${basePath}/pyodide/packages/pillow-10.2.0-cp312-cp312-pyodide_2024_0_wasm32.whl")
         `);
 
         pyodideReady = true;
