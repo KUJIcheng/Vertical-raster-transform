@@ -52,4 +52,17 @@ Photo Rasteriator is a web-based tool that allows users to upload an image, adju
 ## Example Input and Output
 Here is a comparison of the input and output images:
 
-<table> <tr> <td><strong>Original Image</strong></td> <td><strong>Processed Image</strong></td> </tr> <tr> <td><img src="photos/65368.jpg" alt="Original Image" width="400"></td> <td><img src="photos/65368_rasterization.jpg" alt="Processed Image" width="400"></td> </tr> </table>
+<table> <tr> <td><strong>Original Image</strong></td> <td><strong>Processed Image</strong></td> </tr> <tr> <td><img src="photos/flower.jpg" alt="Original Image" width="400"></td> <td><img src="photos/flower_rasterization.jpg" alt="Processed Image" width="400"></td> </tr> </table>
+
+## Changelog
+
+- **Version 1.00**: Initial release, featuring the **Raster Glass Wallpaper Generator** and its interactive control system. (2025-01-08)
+
+- **Version 1.01**: Added **Rainbow Glass** effect — a simulation of regularly spaced micro-prismatic glass textures.  
+  The `Compression Ratio` parameter controls the proportion of each micro-ridge's width relative to the image; higher values result in narrower ridges. (2025-05-02)
+
+<p align="center">
+  <img src="photos/RBEffect.png" alt="Rainbow Glass Effect Example" width="800">
+</p>
+
+- **Version 1.02**: Integrated the **Pyodide runtime** and required **Python wheel packages** directly into the webpage to eliminate instability from remote CDN loading. (2025-05-17)

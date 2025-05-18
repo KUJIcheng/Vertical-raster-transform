@@ -5,6 +5,8 @@
 
 # 光栅壁纸生成器
 
+👉 [点击这里访问网页版本](https://kujicheng.github.io/Vertical-raster-transform/)
+
 **光栅壁纸生**成器是一个基于网页的工具，用户可以上传图片、调整多种参数，并通过运行在浏览器中的 Pyodide 执行 Python 脚本，生成光栅化后的图像。该工具使用 SvelteKit 构建，提供了响应式且易于使用的界面。
 
 ---
@@ -58,7 +60,19 @@
     <td><strong>处理后图像</strong></td>
   </tr>
   <tr>
-    <td><img src="photos/65368.jpg" alt="原始图像" width="400"></td>
-    <td><img src="photos/65368_rasterization.jpg" alt="处理后图像" width="400"></td>
+    <td><img src="photos/flower.jpg" alt="原始图像" width="400"></td>
+    <td><img src="photos/flower_rasterization.jpg" alt="处理后图像" width="400"></td>
   </tr>
 </table>
+
+## 更新日志
+
+- **Version 1.00** : 初始版本，包含光栅壁纸生成功能以及对应的交互系统(2025-1-8)
+
+- **Version 1.01** : 新增**虹玻璃**模拟效果，一种规律间隔微棱突起的玻璃纹理模拟；`聚光压缩比`参数可以理解为每个微棱的宽度占图片的比例，参数越大对应的棱宽越窄(2025-5-2)
+
+<p align="center">
+  <img src="photos/RBEffect.png" alt="Original Image" width="800">
+</p>
+
+- **Version 1.02** : 将pyodide组件以及对应的python工作包集成进网页中，以避免远程加载脚本带来的不稳定问题(2025-5-17)
